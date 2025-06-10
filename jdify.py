@@ -10,7 +10,7 @@ def parse_resume_with_pandoc(pdf_path):
             ["pandoc", pdf_path, "-t", "plain"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
         return result.stdout
     except subprocess.CalledProcessError as e:
@@ -40,7 +40,7 @@ def get_chatgpt_feedback(client, resume_text, job_description):
         "matches the job requirements. Be direct and specific about strengths and "
         "weaknesses. Focus on whether this candidate would be a good fit for the role."
     )
-    
+
     user_prompt = f"""Here is the resume:
 
 {resume_text}
@@ -50,14 +50,14 @@ Here is the job description:
 {job_description}
 
 Please evaluate how well this resume matches the job requirements and provide feedback."""
-    
+
     try:
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ]
+                {"role": "user", "content": user_prompt},
+            ],
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -69,62 +69,64 @@ def main():
     if len(sys.argv) != 2:
         print("Usage: python jdify.py resume.pdf")
         sys.exit(1)
-    
+
     resume_path = sys.argv[1]
-    
+
     if not os.path.exists(resume_path):
         print(f"Error: File {resume_path} not found.")
         sys.exit(1)
-    
+
     # Check for OpenAI API key
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("Error: OPENAI_API_KEY environment variable not set.")
         sys.exit(1)
-    
+
     client = OpenAI(api_key=api_key)
-    
+
     # Parse resume
     print("Parsing resume...")
     resume_text = parse_resume_with_pandoc(resume_path)
-    
+
     # Display parsed resume
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("PARSED RESUME CONTENT:")
-    print("="*50)
+    print("=" * 50)
     print(resume_text)
-    print("="*50)
-    
+    print("=" * 50)
+
     # Confirm parsing
     while True:
-        confirm = input("\nDoes the parsed content look correct? (y/n): ").lower().strip()
-        if confirm in ['y', 'yes']:
+        confirm = (
+            input("\nDoes the parsed content look correct? (y/n): ").lower().strip()
+        )
+        if confirm in ["y", "yes"]:
             break
-        elif confirm in ['n', 'no']:
+        elif confirm in ["n", "no"]:
             print("Please check your resume file and try again.")
             sys.exit(1)
-    
+
     # Main interaction loop
     try:
         while True:
             job_description = get_job_description()
-            
+
             if not job_description.strip():
                 print("No job description provided. Skipping...")
                 continue
-            
+
             print("\nGetting feedback from ChatGPT...")
             feedback = get_chatgpt_feedback(client, resume_text, job_description)
-            
+
             if feedback:
-                print("\n" + "="*50)
+                print("\n" + "=" * 50)
                 print("CHATGPT FEEDBACK:")
-                print("="*50)
+                print("=" * 50)
                 print(feedback)
-                print("="*50)
+                print("=" * 50)
             else:
                 print("Failed to get feedback. Please try again.")
-    
+
     except KeyboardInterrupt:
         print("\nExiting...")
         sys.exit(0)
