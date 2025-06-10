@@ -4,20 +4,20 @@ import subprocess
 from openai import OpenAI
 
 
-def parse_resume_with_pandoc(pdf_path):
+def parse_resume_with_pdftotext(pdf_path):
     try:
         result = subprocess.run(
-            ["pandoc", pdf_path, "-t", "plain"],
+            ["pdftotext", pdf_path, "-"],
             capture_output=True,
             text=True,
             check=True,
         )
         return result.stdout
     except subprocess.CalledProcessError as e:
-        print(f"Error parsing PDF with pandoc: {e}")
+        print(f"Error parsing PDF with pdftotext: {e}")
         sys.exit(1)
     except FileNotFoundError:
-        print("Error: pandoc not found. Please install pandoc.")
+        print("Error: pdftotext not found. Please install pdftotext.")
         sys.exit(1)
 
 
@@ -86,7 +86,7 @@ def main():
 
     # Parse resume
     print("Parsing resume...")
-    resume_text = parse_resume_with_pandoc(resume_path)
+    resume_text = parse_resume_with_pdftotext(resume_path)
 
     # Display parsed resume
     print("\n" + "=" * 50)
