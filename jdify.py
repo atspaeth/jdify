@@ -35,17 +35,19 @@ def get_job_description():
 
 def get_chatgpt_feedback(client, resume_text, job_description):
     system_prompt = (
-        "You are a hiring manager reviewing a resume for a specific job opening. "
-        "Your job is to provide honest, constructive feedback on how well this resume "
-        "matches the job requirements. Be direct and specific about strengths and "
-        "weaknesses. Focus on whether this candidate would be a good fit for the role."
-    )
+        "You are a hiring manager reviewing a resume against job openings. "
+        "Your job is to provide honest, constructive feedback on how well this resume matches the job requirements. "
+        "Outline strengths and weaknesses, then conclude with a brief statement on whether you would interview this candidate. "
+        "\n\n"
+        "Focus on whether this candidate would be a good fit for the role. "
+        "Be concise and direct, but keep the feedback constructive. "
+        "Focus on content, not writing style. "
+        "\n\n"
+        "Here is the resume:"
+        "\n\n"
+    ) + resume_text
 
-    user_prompt = f"""Here is the resume:
-
-{resume_text}
-
-Here is the job description:
+    user_prompt = f"""Here is the job description:
 
 {job_description}
 
@@ -53,7 +55,7 @@ Please evaluate how well this resume matches the job requirements and provide fe
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
