@@ -1,5 +1,5 @@
 [project]
-name = "jdit"
+name = "jdify"
 version = "0.1.0"
 description = "A tool for having ChatGPT evaluate your resume."
 readme = "README.md"
