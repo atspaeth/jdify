@@ -1,0 +1,7 @@
+[project]
+name = "jdit"
+version = "0.1.0"
+description = "A tool for having ChatGPT evaluate your resume."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
