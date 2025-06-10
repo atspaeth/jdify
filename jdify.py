@@ -1,6 +1,9 @@
-import sys
+import argparse
 import os
 import subprocess
+import sys
+from argparse import ArgumentParser, FileType
+
 from openai import OpenAI
 
 
@@ -68,15 +71,14 @@ Please evaluate how well this resume matches the job requirements and provide fe
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python jdify.py resume.pdf")
-        sys.exit(1)
-
-    resume_path = sys.argv[1]
-
-    if not os.path.exists(resume_path):
-        print(f"Error: File {resume_path} not found.")
-        sys.exit(1)
+    parser = ArgumentParser()
+    parser.add_argument("resume", help="Filename of your resume.")
+    parser.add_argument(
+        "--confirm",
+        action="store_true",
+        help="display parsed resume contents for confirmation",
+    )
+    args = parser.parse_args()
 
     # Check for OpenAI API key
     api_key = os.getenv("OPENAI_API_KEY")
@@ -87,26 +89,29 @@ def main():
     client = OpenAI(api_key=api_key)
 
     # Parse resume
-    print("Parsing resume...")
-    resume_text = parse_resume_with_pdftotext(resume_path)
+    if not os.path.isfile(args.resume):
+        print(f"Error: file {args.resume} not found.")
+        sys.exit(1)
+    resume_text = parse_resume_with_pdftotext(args.resume)
 
     # Display parsed resume
-    print("\n" + "=" * 50)
-    print("PARSED RESUME CONTENT:")
-    print("=" * 50)
-    print(resume_text)
-    print("=" * 50)
+    if args.confirm:
+        print("\n" + "=" * 50)
+        print("PARSED RESUME CONTENT:")
+        print("=" * 50)
+        print(resume_text)
+        print("=" * 50)
 
-    # Confirm parsing
-    while True:
-        confirm = (
-            input("\nDoes the parsed content look correct? (y/n): ").lower().strip()
-        )
-        if confirm in ["y", "yes"]:
-            break
-        elif confirm in ["n", "no"]:
-            print("Please check your resume file and try again.")
-            sys.exit(1)
+        # Confirm parsing
+        while True:
+            confirm = (
+                input("\nDoes the parsed content look correct? (y/n): ").lower().strip()
+            )
+            if confirm in ["y", "yes"]:
+                break
+            elif confirm in ["n", "no"]:
+                print("Please check your resume file and try again.")
+                sys.exit(1)
 
     # Main interaction loop
     try:

@@ -8,8 +8,8 @@ Uses `pdftotext` and the OpenAI API.
 ## Usage
 
 If you run `python jdify.py resume.pdf`, you get the following interaction loop:
-1. The resume is parsed to plain text using `pdftotext` and printed to the terminal.
-2. You are asked to confirm that the content was parsed correctly.
+1. The resume is parsed to plain text using `pdftotext`.
+2. If `--confirm` was passed, the resume is printed and you are asked to confirm the contents.
 3. A prompt will appear where you can paste a multi-line job description.
 4. If you press ^D, the JD is done, and ChatGPT's feedback is shown.
 5. The last two steps repeat in a loop until you quit with ^C.
